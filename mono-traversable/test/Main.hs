@@ -13,7 +13,7 @@ import Data.Containers
 import Data.Sequences
 import qualified Data.Sequence as Seq
 import qualified Data.NonNull as NN
-import Data.Monoid (mempty, mconcat)
+import Data.Monoid (mempty, mconcat, (<>))
 import Data.Maybe (fromMaybe)
 import qualified Data.List as List
 
@@ -204,6 +204,39 @@ main = hspec $ do
         test "works on lazy bytestrings" L.empty
         test "works on strict texts" T.empty
         test "works on lazy texts" TL.empty
+
+    describe "inits" $ do
+        let test typ emptyTyp = describe typ $ do
+              it "empty" $ inits emptyTyp @?= [""]
+              it "one element" $ inits ("a" <> emptyTyp) @?= ["", "a"]
+              it "two elements" $ inits ("ab" <> emptyTyp) @?= ["", "a", "ab"]
+        test "StrictBytestring" S.empty
+        test "LazyBytestring" L.empty
+        test "StrictText" T.empty
+        test "LazyText" TL.empty
+        test "String" (mempty :: String)
+
+    describe "tails" $ do
+        let test typ emptyTyp = describe typ $ do
+              it "empty" $ tails emptyTyp @?= [""]
+              it "one element" $ tails ("a" <> emptyTyp) @?= ["a", ""]
+              it "two elements" $ tails ("ab" <> emptyTyp) @?= ["ab", "b", ""]
+        test "StrictBytestring" S.empty
+        test "LazyBytestring" L.empty
+        test "StrictText" T.empty
+        test "LazyText" TL.empty
+        test "String" (mempty :: String)
+
+    describe "initTails" $ do
+        let test typ emptyTyp = describe typ $ do
+              it "empty" $ initTails emptyTyp @?= [("","")]
+              it "one element" $ initTails ("a" <> emptyTyp) @?= [("","a"), ("a","")]
+              it "two elements" $ initTails ("ab" <> emptyTyp) @?= [("","ab"), ("a","b"), ("ab","")]
+        test "StrictBytestring" S.empty
+        test "LazyBytestring" L.empty
+        test "StrictText" T.empty
+        test "LazyText" TL.empty
+        test "String" (mempty :: String)
 
     describe "NonNull" $ do
         describe "fromNonEmpty" $ do
